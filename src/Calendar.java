@@ -2012,7 +2012,7 @@ public class Calendar extends javax.swing.JFrame{
             }
     }    
     
-    public void csRequestReceived(String remoteAddress,int remoteClock) {
+    public void csRequestReceived(String resource_id,String remoteAddress,int remoteClock) {
         if(remoteClock > localClock) highClock = remoteClock;
         else highClock = localClock;
         
