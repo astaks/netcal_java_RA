@@ -753,8 +753,8 @@ public class Calendar extends javax.swing.JFrame{
         } 
         this.clearQueuedFunc();
         this.resetQueue();
-        if(serverAddress.length() > 10)
-            algorithm = this.getAlgorithm();
+        //if(serverAddress.length() > 10)
+        algorithm = this.jrb1.isSelected() ? 0 : 1; //this.getAlgorithm();
         if(algorithm == 0){ // Token Ring
             createTokenThread();
             stopTokenPassing();          
@@ -960,13 +960,13 @@ public class Calendar extends javax.swing.JFrame{
     private void jbtSetServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtSetServerActionPerformed
         String disp = "";
         if(serverAddress.length() > 9){ // no proper check if IP is valid
-            disp = serverIP+":"+serverPort;
+            disp = serverIP + ":" + serverPort;
         }
         else disp = "192.168.0.100:8000"; //myIP+":"+myPort;
         String input =  JOptionPane.showInputDialog(this 
                ,"Enter new Connect Address:",disp);
         if(input != null) {
-            if(input.equals(myIP+":"+myPort))                
+            if(input.equals(myIP + ":" + myPort))                
                 JOptionPane.showMessageDialog(null, "Connect IP cannot be own IP.", "IP Error", JOptionPane.ERROR_MESSAGE);
             else
                 this.setAddress(""+myIP+":"+myPort, input);
@@ -1091,11 +1091,11 @@ public class Calendar extends javax.swing.JFrame{
             return;            
         }
         
-        /* @todo uncomment
-        if(this.addressList.size() == 1){
+        
+        /*if(this.addressList.size() == 1){
             performFunction(3,id,date,time,duration,header,comment);
             return;
-        }*/        
+        } */       
         
         if(algorithm == 0){ // Token Ring
             if(this.hasToken() == true){
@@ -1107,11 +1107,11 @@ public class Calendar extends javax.swing.JFrame{
             }
         }        
         else {
-            Logger.getLogger(Calendar.class.getName()).log(Level.SEVERE, "In edit");
+            System.out.println("In RA Edit");
             sendCsRequest(String.valueOf(id));
             this.waitReplies();
             this.executeAll(String.valueOf(id), 3, id, date, time, duration, header, comment);
-            Logger.getLogger(Calendar.class.getName()).log(Level.SEVERE, "Perfomed edit");
+            System.out.println("RA edit finished");
         }
     }//GEN-LAST:event_jbtEditActionPerformed
     
@@ -1317,15 +1317,15 @@ public class Calendar extends javax.swing.JFrame{
             this.serverAddress = srvAdd; //"http://" + srvAdd + "/";
             this.serverIP = srvA;
             this.serverPort = Integer.parseInt(srvP); 
-            this.jrb1.setEnabled(false);
-            this.jrb2.setEnabled(false);               
+            //this.jrb1.setEnabled(false);
+            //this.jrb2.setEnabled(false);               
         }
         else {
             this.serverAddress = "";
             this.serverIP = "";
             this.serverPort = 0;          
-            this.jrb1.setEnabled(true);
-            this.jrb2.setEnabled(true);
+            //this.jrb1.setEnabled(true);
+            //this.jrb2.setEnabled(true);
         }
             
         this.jlbMyIP.setText(myAddress);
@@ -1995,7 +1995,7 @@ public class Calendar extends javax.swing.JFrame{
         try {
             for(String s:addressList){
                 //if(s.equalsIgnoreCase(myAddress))
-                //continue;                
+                //    continue;                
                 config.setServerURL(new URL(addHttp(s))); 
                 client.setConfig(config);   
 
