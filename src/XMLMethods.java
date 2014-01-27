@@ -77,8 +77,8 @@ public class XMLMethods {
         return 0;
     }    
     
-    public int csRequestReceived(String remoteAddress,int remoteClock){
-        Main.form.csRequestReceived(remoteAddress,remoteClock);
+    public int csRequestReceived(String resourceId, String remoteAddress,int remoteClock){
+        Main.form.csRequestReceived(resourceId, remoteAddress, remoteClock);
         return 0;
     }         
     

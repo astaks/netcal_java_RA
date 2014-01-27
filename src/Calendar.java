@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -63,8 +64,10 @@ public class Calendar extends javax.swing.JFrame{
     public long sleepTimeRA= 200;
     private int localClock = 0;
     private int highClock = 0;
-    private ArrayList<String> queue = new ArrayList<String>();      
+    private ArrayList<String> queue = new ArrayList<String>();
     private boolean requestCS = false;
+    private HashSet<String> resourcesAccessing = new HashSet<String>(64);
+    private HashSet<String> resourcesWant2Access = new HashSet<String>(64);
     private int numRepliesReq;
     public int numRepliesRecived;    
     
@@ -1018,7 +1021,7 @@ public class Calendar extends javax.swing.JFrame{
             localClock = highClock + 1;
             numRepliesReq = this.addressList.size() - 1;
             numRepliesRecived = 0;
-            sendCsRequest(myAddress,localClock);            
+            sendCsRequest("*");            
         }
     }//GEN-LAST:event_jbtAddActionPerformed
 
@@ -1053,7 +1056,7 @@ public class Calendar extends javax.swing.JFrame{
             localClock = highClock + 1;
             numRepliesReq = this.addressList.size() - 1;
             numRepliesRecived = 0;
-            sendCsRequest(myAddress,localClock);            
+            sendCsRequest(String.valueOf(id));            
         }        
     }//GEN-LAST:event_jbtDelActionPerformed
 
@@ -1088,10 +1091,11 @@ public class Calendar extends javax.swing.JFrame{
             return;            
         }
         
+        /* @todo uncomment
         if(this.addressList.size() == 1){
             performFunction(3,id,date,time,duration,header,comment);
             return;
-        }        
+        }*/        
         
         if(algorithm == 0){ // Token Ring
             if(this.hasToken() == true){
@@ -1103,16 +1107,21 @@ public class Calendar extends javax.swing.JFrame{
             }
         }        
         else {
-            queueFunc(3,id,date,time,duration,header,comment);
-            if(requestCS == true) return;
-            requestCS = true;
-            localClock = highClock + 1;
-            numRepliesReq = this.addressList.size() - 1;
-            numRepliesRecived = 0;
-            sendCsRequest(myAddress,localClock);            
+            Logger.getLogger(Calendar.class.getName()).log(Level.SEVERE, "In edit");
+            sendCsRequest(String.valueOf(id));
+            this.waitReplies();
+            this.executeAll(String.valueOf(id), 3, id, date, time, duration, header, comment);
+            Logger.getLogger(Calendar.class.getName()).log(Level.SEVERE, "Perfomed edit");
         }
     }//GEN-LAST:event_jbtEditActionPerformed
-
+    
+    private void waitReplies(){
+        while(this.numRepliesRecived != this.numRepliesReq){
+                System.out.println("waiting "+ this.numRepliesReq);
+                delay(100);
+            }
+    }
+    
     private void jbtSetHostIPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtSetHostIPActionPerformed
         String disp = "";
         if(myAddress.length() > 9){ // no proper check if IP is valid
@@ -1153,8 +1162,7 @@ public class Calendar extends javax.swing.JFrame{
         algorithm = 1;
     }//GEN-LAST:event_jrb2ActionPerformed
 
-    private void updateTextFields()
-    {
+    private void updateTextFields(){
         int row = this.jtbData.getSelectedRow();
         String id = "", date = "", time = "", duration = "", header = "", comment = "";
         if(this.jtbData.getValueAt(row,0) != null) id = this.jtbData.getValueAt(row,0).toString();
@@ -1825,6 +1833,7 @@ public class Calendar extends javax.swing.JFrame{
     }    
     
     public void performFunction(int f,int id, String date, String time, String duration, String header, String comment) {
+        System.out.println("Perfoming function" + f);
         switch(f){
             case 1: 
                 max_id = addRow(date,time,duration,header,comment);  // add row to local database
@@ -1897,7 +1906,38 @@ public class Calendar extends javax.swing.JFrame{
     public int getCS() {
         return cs;
     }
-
+    
+    private void executeAll(String resourceId, int f,int id, String date, String time, String duration, String header, 
+                            String comment){
+        this.numRepliesRecived = 0;
+        this.resourcesAccessing.add(resourceId);
+        this.resourcesWant2Access.remove(resourceId);
+        Object[] params = new Object[7];
+        try {
+            for(String s:addressList){              
+                config.setServerURL(new URL(addHttp(s))); 
+                client.setConfig(config);   
+                try {
+                    params[0] = new Integer(f);
+                    params[1] = new Integer(id);
+                    params[2] = new String(date);
+                    params[3] = new String(time);                        
+                    params[4] = new String(duration);
+                    params[5] = new String(header);                        
+                    params[6] = new String(comment);
+                    int retval = (Integer) client.execute("handler1.functionsToPerform", params);
+                 } catch (Exception exception) {
+                    System.err.println("JavaServer: " + exception);                    
+                }                     
+            }
+            this.resourcesAccessing.remove(resourceId);
+            this.sendReplyAll(this.myAddress);
+            this.resetQueue();
+        } catch (Exception exception) {
+          System.err.println("JavaServer: " + exception);
+        }
+    }
+    
     private void distributeFunc() {
         int count = funcList.size();   
         if (count < 1) return;
@@ -1943,19 +1983,25 @@ public class Calendar extends javax.swing.JFrame{
         this.jlbHighestClock.setText(""+highClock);
     }
 
-    private void sendCsRequest(String myAddress, int localClock) {
+    private void sendCsRequest(String resourceId) {
+        Logger.getLogger(Calendar.class.getName()).log(Level.SEVERE, "Sending cs request");
         
-        Object[] params = new Object[2];
+        this.localClock ++;
+        this.resourcesWant2Access.add(resourceId);
+        this.numRepliesReq = this.addressList.size();
+        this.numRepliesRecived = 0;
+        Object[] params = new Object[3];
 
         try {
             for(String s:addressList){
-                if(s.equalsIgnoreCase(myAddress))
-                    continue;                
+                //if(s.equalsIgnoreCase(myAddress))
+                //continue;                
                 config.setServerURL(new URL(addHttp(s))); 
                 client.setConfig(config);   
 
-                params[0] = new String(myAddress);
-                params[1] = new Integer(localClock);
+                params[0] = new String(resourceId);
+                params[1] = new String(this.myAddress);
+                params[2] = new Integer(this.localClock);
                 int retval = (Integer) client.execute("handler1.csRequestReceived", params);                
             }   
         } catch (Exception exception) {
@@ -1964,6 +2010,9 @@ public class Calendar extends javax.swing.JFrame{
     }
 
     public void replyReceived(String remoteAddress) {
+        System.out.println("Received reply from "+ remoteAddress);
+        this.numRepliesRecived++;
+        /*
         this.numRepliesRecived++;
         System.out.println(""+this.numRepliesRecived+ " replies received. " + getPort(remoteAddress));
         if(this.numRepliesRecived == this.numRepliesReq){
@@ -1975,6 +2024,7 @@ public class Calendar extends javax.swing.JFrame{
             this.requestCS = false;
             sendReplyAll(myAddress);               
         }
+        */
     }
 
     public void sendReplyAll(String myAddress) {
@@ -1998,6 +2048,7 @@ public class Calendar extends javax.swing.JFrame{
         }
         System.out.println("Reply Sent to " + count + " queued hosts RA");
     }
+    
     public void sendReply(String remoteAddress) {
 
         Object[] params = new Object[]{new String(myAddress)};
@@ -2012,34 +2063,47 @@ public class Calendar extends javax.swing.JFrame{
             }
     }    
     
-    public void csRequestReceived(String remoteAddress,int remoteClock) {
-        if(remoteClock > localClock) highClock = remoteClock;
-        else highClock = localClock;
-        
-        if(requestCS == false || remClockLow(remoteClock,remoteAddress) == true){
-            sendReply(remoteAddress);
-        }
-        else{
-            queue.add(remoteAddress);
+    public void csRequestReceived(String resourceId, String remoteAddress, int remoteClock) {
+        this.localClock = Math.max(this.localClock, remoteClock) + 1;
+        System.out.println("Received csRequest");
+        if(this.resourcesAccessing.contains(resourceId) == false &&
+                this.resourcesWant2Access.contains(resourceId) == false){
+            System.out.println("not accesing resource "+resourceId+" sending reply");
+            this.sendReply(remoteAddress);
+        }else if(this.resourcesAccessing.contains(resourceId)){
+            System.out.println("currently using resource "+resourceId+" defer");
+            this.queue.add(remoteAddress);
+        }else if(this.resourcesWant2Access.contains(resourceId)){
+            System.out.println("wanto access resource "+resourceId+" too");
+            if(this.compareClocks(remoteClock, remoteAddress)){
+                this.sendReply(remoteAddress);
+            }
+            else{
+                System.out.println("We should defer request");
+                this.queue.add(remoteAddress);
+            }
         }
         updateRAdisplay();
-               
     }
-
-    private boolean remClockLow(int remoteClock, String remoteAddress) {
-        if(remoteClock < localClock) return true;
-        if(remoteClock > localClock) return false;
-        
+    
+    private boolean compareClocks(int remoteClock, String remoteAddress){
+        if(remoteClock < this.localClock)
+            return true;
+        else if (remoteClock > this.localClock)
+            return false;
         int remAdd = getAdd(remoteAddress);
         int locAdd = getAdd(myAddress);
+        if(remAdd < locAdd)
+            return true;
+        else if(remAdd > locAdd)
+            return false;
         
-        if(remAdd < locAdd) return true;
-        if(remAdd > locAdd) return false;
-
-        int remPort = getPort(remoteAddress);        
-        if(remPort < myPort) return true;
-        if(remPort > myPort) return false;
+        int remPort = getPort(remoteAddress);
         
+        if(remPort < myPort)
+            return true;
+        else if(remPort > myPort)
+            return false;
         return true;
     }
 
