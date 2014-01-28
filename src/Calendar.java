@@ -65,7 +65,7 @@ public class Calendar extends javax.swing.JFrame{
     private int localClock = 0;
     private int highClock = 0;
     private ArrayList<String> queue = new ArrayList<String>();
-    private boolean requestCS = false;
+    
     private HashSet<String> resourcesAccessing = new HashSet<String>(64);
     private HashSet<String> resourcesWant2Access = new HashSet<String>(64);
     private int numRepliesReq;
@@ -82,6 +82,7 @@ public class Calendar extends javax.swing.JFrame{
     public Calendar() {
         initComponents();
     }
+    
     public Calendar(String myAdd,String srvAdd) {
         initComponents();
         this.jPanelRA.setVisible(false);
@@ -156,9 +157,8 @@ public class Calendar extends javax.swing.JFrame{
         jPanelTR = new javax.swing.JPanel();
         jlbImage1 = new javax.swing.JLabel();
         jPanelRA = new javax.swing.JPanel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
         jlbLocalClock = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         jlbHighestClock = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
@@ -398,8 +398,12 @@ public class Calendar extends javax.swing.JFrame{
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jPanel2, jScrollPane2});
@@ -408,9 +412,9 @@ public class Calendar extends javax.swing.JFrame{
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2))
+                .addContainerGap())
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("IP Address"));
@@ -609,11 +613,9 @@ public class Calendar extends javax.swing.JFrame{
                 .addGap(0, 12, Short.MAX_VALUE))
         );
 
-        jLabel11.setText("Local Clock:");
-
-        jLabel12.setText("High Clock:");
-
         jlbLocalClock.setText("-");
+
+        jLabel11.setText("Local Clock:");
 
         jlbHighestClock.setText("-");
 
@@ -622,9 +624,7 @@ public class Calendar extends javax.swing.JFrame{
         jPanelRALayout.setHorizontalGroup(
             jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelRALayout.createSequentialGroup()
-                .addGroup(jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jlbLocalClock, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -637,13 +637,11 @@ public class Calendar extends javax.swing.JFrame{
         jPanelRALayout.setVerticalGroup(
             jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelRALayout.createSequentialGroup()
-                .addGroup(jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
-                    .addComponent(jlbLocalClock))
+                .addGroup(jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jlbLocalClock, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanelRALayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jlbHighestClock))
+                .addComponent(jlbHighestClock)
                 .addContainerGap())
         );
 
@@ -655,7 +653,7 @@ public class Calendar extends javax.swing.JFrame{
                 .addGap(2, 2, 2)
                 .addComponent(jPanelTR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelRA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanelRA, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel10Layout.setVerticalGroup(
@@ -727,15 +725,14 @@ public class Calendar extends javax.swing.JFrame{
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
             .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
@@ -773,7 +770,6 @@ public class Calendar extends javax.swing.JFrame{
         }
         else{ // R&A
             localClock = 0;
-            highClock = 0;
             resetQueue();
             updateRAdisplay();
             if(serverAddress.length() < 1 || myAddress.equalsIgnoreCase(serverAddress)){
@@ -789,6 +785,7 @@ public class Calendar extends javax.swing.JFrame{
         }        
         
     }//GEN-LAST:event_jbtSignInActionPerformed
+    
     public void signIn(boolean oneComp){
 
         Object[] ret = null;
@@ -1015,13 +1012,11 @@ public class Calendar extends javax.swing.JFrame{
             }
         }        
         else { // R&A
-            queueFunc(1,-1,date,time,duration,header,comment);
-            if(requestCS == true) return;
-            requestCS = true;
-            localClock = highClock + 1;
-            numRepliesReq = this.addressList.size() - 1;
-            numRepliesRecived = 0;
-            sendCsRequest("*");            
+            System.out.println("In RA Add");
+            sendCsRequest("*");
+            this.waitReplies();
+            this.executeAll("*", 1, -1,date,time,duration,header,comment);
+            System.out.println("RA Add finished");           
         }
     }//GEN-LAST:event_jbtAddActionPerformed
 
@@ -1050,13 +1045,11 @@ public class Calendar extends javax.swing.JFrame{
             }
         }        
         else {
-            queueFunc(2,id,"","","","","");
-            if(requestCS == true) return;
-            requestCS = true;
-            localClock = highClock + 1;
-            numRepliesReq = this.addressList.size() - 1;
-            numRepliesRecived = 0;
-            sendCsRequest(String.valueOf(id));            
+            System.out.println("In RA Delete");
+            sendCsRequest(String.valueOf(id));
+            this.waitReplies();
+            this.executeAll(String.valueOf(id), 2, id, "","","","","");
+            System.out.println("RA delete finished");           
         }        
     }//GEN-LAST:event_jbtDelActionPerformed
 
@@ -1091,11 +1084,10 @@ public class Calendar extends javax.swing.JFrame{
             return;            
         }
         
-        
-        /*if(this.addressList.size() == 1){
+        if(this.addressList.size() == 1){
             performFunction(3,id,date,time,duration,header,comment);
             return;
-        } */       
+        }  
         
         if(algorithm == 0){ // Token Ring
             if(this.hasToken() == true){
@@ -1158,7 +1150,7 @@ public class Calendar extends javax.swing.JFrame{
 
     private void jrb2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrb2ActionPerformed
         this.jPanelTR.setVisible(false);      
-        this.jPanelRA.setVisible(true);
+        this.jPanelRA.setVisible(false);
         algorithm = 1;
     }//GEN-LAST:event_jrb2ActionPerformed
 
@@ -1220,7 +1212,6 @@ public class Calendar extends javax.swing.JFrame{
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1980,7 +1971,6 @@ public class Calendar extends javax.swing.JFrame{
     
     public void updateRAdisplay() {    
         this.jlbLocalClock.setText(""+localClock);
-        this.jlbHighestClock.setText(""+highClock);
     }
 
     private void sendCsRequest(String resourceId) {
@@ -1993,9 +1983,7 @@ public class Calendar extends javax.swing.JFrame{
         Object[] params = new Object[3];
 
         try {
-            for(String s:addressList){
-                //if(s.equalsIgnoreCase(myAddress))
-                //    continue;                
+            for(String s:addressList){              
                 config.setServerURL(new URL(addHttp(s))); 
                 client.setConfig(config);   
 
@@ -2012,19 +2000,6 @@ public class Calendar extends javax.swing.JFrame{
     public void replyReceived(String remoteAddress) {
         System.out.println("Received reply from "+ remoteAddress);
         this.numRepliesRecived++;
-        /*
-        this.numRepliesRecived++;
-        System.out.println(""+this.numRepliesRecived+ " replies received. " + getPort(remoteAddress));
-        if(this.numRepliesRecived == this.numRepliesReq){
-            performQueuedFunc();
-            distributeFunc();
-            clearQueuedFunc();     
-            updateRAdisplay();    
-            
-            this.requestCS = false;
-            sendReplyAll(myAddress);               
-        }
-        */
     }
 
     public void sendReplyAll(String myAddress) {
@@ -2086,13 +2061,18 @@ public class Calendar extends javax.swing.JFrame{
         updateRAdisplay();
     }
     
+    /*
+    returns true if remoteClock < localClock
+    */
     private boolean compareClocks(int remoteClock, String remoteAddress){
         if(remoteClock < this.localClock)
             return true;
         else if (remoteClock > this.localClock)
             return false;
+        
         int remAdd = getAdd(remoteAddress);
         int locAdd = getAdd(myAddress);
+        
         if(remAdd < locAdd)
             return true;
         else if(remAdd > locAdd)
@@ -2108,15 +2088,25 @@ public class Calendar extends javax.swing.JFrame{
     }
 
     private int getAdd(String address) {
-        
         String addr = address.split("\\:")[0];
+        try{
+            InetAddress rawAddr = InetAddress.getByName(addr);
+            int result = 0;  
+            for (byte b: rawAddr.getAddress())  
+                result = result << 8 | (b & 0xFF);
+            return result;
+        }catch(java.net.UnknownHostException e)
+        {
+            return 0;
+        }
         
+        /*
         int o1 = Integer.parseInt(addr.split("\\.")[0]);
         int o2 = Integer.parseInt(addr.split("\\.")[1]);
         int o3 = Integer.parseInt(addr.split("\\.")[2]);
         int o4 = Integer.parseInt(addr.split("\\.")[3]);        
         
-        return o1 * 256*256*256 + o2 *256*256 + o3 * 256 + o4;
+        return o1 * 256*256*256 + o2 *256*256 + o3 * 256 + o4;*/
     }
 
     private int getPort(String address) {
